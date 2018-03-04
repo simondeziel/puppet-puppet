@@ -12,8 +12,9 @@ class puppet::agent (
   # run the puppet agent from cron to save on RAM
   # and not using mcollective (yet)
   service { ['puppet','mcollective']:
-    ensure => stopped,
-    enable => false,
+    ensure  => stopped,
+    enable  => false,
+    require => Package['puppet-agent'],
   }
 
   if $facts['aio_agent_version'] {
