@@ -2,6 +2,9 @@
 
 # File is managed by Puppet
 
+set -u
+set -e
+
 export LC_ALL="C.UTF-8"
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
