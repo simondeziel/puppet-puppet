@@ -14,7 +14,8 @@ class puppet::agent (
     }
 
     if $purge_distro_puppet {
-      $distro_pkgs = [ 'facter',
+      $distro_pkgs = [ 'augeas-lenses',
+                       'facter',
                        'hiera',
                        'puppet-common',
                        'ruby',
