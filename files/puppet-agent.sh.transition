@@ -28,7 +28,7 @@ done
 # only remove it if it has the right home dir because
 # a user of the same name is used by puppetserver
 if getent passwd puppet | grep -q ':/var/lib/puppet'; then
-  deluser puppet
+  deluser --quiet puppet
 fi
 
 exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize
