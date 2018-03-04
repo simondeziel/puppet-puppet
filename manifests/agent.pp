@@ -1,10 +1,10 @@
 #
 class puppet::agent (
-  String  $environment = 'production',
-  Boolean $managed     = true,
-  Boolean $upstream    = false,
+  String  $environment         = 'production',
+  Boolean $managed             = true,
+  Boolean $purge_distro_puppet = false,
 ) {
-  if $upstream or $facts['aio_agent_version'] {
+  if $purge_distro_puppet or $facts['aio_agent_version'] {
     $cron_command = '/opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize'
 
     include puppet
@@ -12,6 +12,29 @@ class puppet::agent (
       ensure  => installed,
       require => Class['puppet'],
     }
+
+    if $purge_distro_puppet {
+      $distro_pkgs = [ 'facter',
+                       'hiera',
+                       'puppet-common',
+                       'ruby',
+                       'ruby-augeas',
+                       'ruby-rgen',
+                       'ruby-safe-yaml',
+                       'ruby-shadow',
+                     ]
+      package { $distro_pkgs:
+        ensure  => purged,
+        require => Class['puppet'],
+      }
+      file { ['/etc/puppet','/var/lib/puppet']:
+        ensure  => absent,
+        force   => true,
+        require => Class['puppet'],
+      }
+  }
+
+
   } else {
     $cron_command = '[ -x /etc/puppet/puppet-agent.sh ] && /etc/puppet/puppet-agent.sh'
 
