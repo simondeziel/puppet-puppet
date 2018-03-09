@@ -17,6 +17,14 @@ class puppet::agent (
     require => Package['puppet-agent'],
   }
 
+  # sudo's secure_path doesn't include /opt/puppetlabs/puppet/bin
+  # add this symlink to make this work: sudo puppet agent -t
+  file { '/usr/local/bin/puppet':
+    ensure  => link,
+    target  => '/opt/puppetlabs/puppet/bin/puppet',
+    require => Package['puppet-agent'],
+  }
+
   if $facts['aio_agent_version'] {
     $cron_command = '/opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize'
     if $managed {
