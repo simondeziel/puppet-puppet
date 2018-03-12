@@ -34,4 +34,11 @@ if getent passwd puppet | grep -q ':/var/lib/puppet'; then
   deluser --quiet puppet
 fi
 
+# remove dpkg-stateoverride entries tied to the puppet user
+if dpkg-statoverride --list | grep -qwF puppet; then
+  for d in /var/lib/puppet /var/log/puppet; do
+    dpkg-statoverride --remove "$d" || true
+  done
+fi
+
 exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize
