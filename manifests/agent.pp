@@ -32,6 +32,26 @@ class puppet::agent (
     } else {
       $cron_ensure = 'absent'
     }
+
+    # AIO puppet.conf path
+    $conf_path = '/etc/puppetlabs/puppet/puppet.conf'
+
+    # error out when there is an unbound variable
+    ini_setting { 'puppet.conf/main/strict_variables':
+      ensure  => present,
+      path    => $conf_path,
+      section => 'main',
+      setting => 'strict_variables',
+      value   => true,
+    }
+    # disable i18n
+    ini_setting { 'puppet.conf/main/disable_i18n':
+      ensure  => present,
+      path    => $conf_path,
+      section => 'main',
+      setting => 'disable_i18n',
+      value   => true,
+    }
   } else {
     # XXX: the legacy client/wrapper script is used one last time to make the transition
     #      to the AIO/upstream client
