@@ -44,10 +44,9 @@ class puppet::agent (
       setting => 'strict_variables',
       value   => true,
     }
-    # XXX: "disable_i18n = true" causes https://tickets.puppetlabs.com/browse/PUP-9023 and PUP-9010
     # disable i18n
     ini_setting { 'puppet.conf/main/disable_i18n':
-      ensure  => absent,
+      ensure  => present,
       path    => $conf_path,
       section => 'main',
       setting => 'disable_i18n',
