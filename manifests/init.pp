@@ -1,22 +1,20 @@
 #
 # Class: puppet
 #
-class puppet {
+class puppet (
+  Enum['5','6'] $major_version = '6',
+) {
   # XXX: same as:
-  #  wget https://apt.puppetlabs.com/puppet5-release-${::lsbdistcodename}.deb
-  #  dpkg -i puppet5-release-${::lsbdistcodename}.deb
-  file { '/etc/apt/trusted.gpg.d/puppet5-keyring.gpg':
+  #  wget https://apt.puppetlabs.com/puppet${major_version}-release-${::lsbdistcodename}.deb
+  #  dpkg -i puppet${major_version}-release-${::lsbdistcodename}.deb
+  file { "/etc/apt/trusted.gpg.d/puppet${major_version}-keyring.gpg":
     ensure => file,
-    source => 'puppet:///modules/puppet/puppet5-keyring.gpg',
+    source => "puppet:///modules/puppet/puppet${major_version}-keyring.gpg",
   }
-  apt::source { 'puppet5':
+  apt::source { "puppet${major_version}":
     architecture => 'amd64',
     location     => 'http://apt.puppetlabs.com',
-    repos        => 'puppet5',
-    #key          => {
-    #  'id'     => '6F6B15509CF8E59E6E469F327F438280EF8D349F',
-    #  'url'    => 'https://apt.puppetlabs.com/DEB-GPG-KEY-puppet',
-    #},
-    require      => File['/etc/apt/trusted.gpg.d/puppet5-keyring.gpg'],
+    repos        => "puppet${major_version}",
+    require      => File["/etc/apt/trusted.gpg.d/puppet${major_version}-keyring.gpg"],
   }
 }
