@@ -53,7 +53,7 @@ class puppet::agent (
   cron { 'puppet-agent':
     ensure   => $cron_ensure,
     user     => 'root',
-    command  => '/opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
+    command  => 'exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
     minute   => fqdn_rand(60),
     hour     =>  [0, 2, '6-18', 22],
     monthday => '*',
