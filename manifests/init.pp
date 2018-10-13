@@ -2,7 +2,7 @@
 # Class: puppet
 #
 class puppet (
-  Integer[5,6] $major_version = 6,
+  Integer[6] $major_version = 6,
 ) {
   # XXX: same as:
   #  wget https://apt.puppetlabs.com/puppet${major_version}-release-${::lsbdistcodename}.deb
