@@ -1,7 +1,8 @@
 #
 class puppet::agent (
-  String  $environment = 'production',
-  Boolean $managed     = true,
+  String  $agent_cron_command = 'exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
+  String  $environment        = 'production',
+  Boolean $managed            = true,
 ) {
   include puppet
   package { 'puppet-agent':
@@ -53,7 +54,7 @@ class puppet::agent (
   cron { 'puppet-agent':
     ensure   => $cron_ensure,
     user     => 'root',
-    command  => 'exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
+    command  => $agent_cron_command,
     minute   => fqdn_rand(60),
     hour     =>  [0, 2, '6-18', 22],
     monthday => '*',
