@@ -1,7 +1,8 @@
 #
 class puppet::agent (
-  String  $environment = 'production',
-  Boolean $managed     = true,
+  String           $environment  = 'production',
+  Boolean          $managed      = true,
+  Optional[String] $cron_wrapper = undef,
 ) {
   include puppet
   package { 'puppet-agent':
@@ -26,7 +27,11 @@ class puppet::agent (
   }
 
   if $facts['aio_agent_version'] {
-    $cron_command = '/opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize'
+    if $cron_wrapper {
+      $cron_command = $cron_wrapper
+    } else {
+      $cron_command = '/opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize'
+    }
     if $managed {
       $cron_ensure = 'present'
     } else {
@@ -59,8 +64,8 @@ class puppet::agent (
     $cron_ensure = 'present'
 
     file { '/etc/puppet/puppet-agent.sh':
-      mode    => '0755',
-      source  => 'puppet:///modules/puppet/puppet-agent.sh.transition',
+      mode   => '0755',
+      source => 'puppet:///modules/puppet/puppet-agent.sh.transition',
     }
   }
 
