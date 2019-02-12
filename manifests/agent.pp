@@ -1,8 +1,10 @@
 #
 class puppet::agent (
-  String  $cron_command       = 'exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
-  String  $environment        = 'production',
-  Boolean $managed            = true,
+  String           $cron_command        = 'exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
+  String           $cron_script_file    = '/usr/local/bin/puppet-cron',
+  Optional[String] $cron_script_content = undef,
+  String           $environment         = 'production',
+  Boolean          $managed             = true,
 ) {
   include puppet
   package { 'puppet-agent':
@@ -49,6 +51,17 @@ class puppet::agent (
   $cron_ensure = $managed ? {
     true    => 'present',
     default => 'absent',
+  }
+
+  if $managed and ! $cron_script_content {
+    fail('Missing cron_script_content for managed agent')
+  }
+
+  file { $cron_script_file:
+    ensure  => $cron_ensure,
+    content => $cron_script_content,
+    mode    => '0755',
+    before  => Cron['puppet-agent'],
   }
 
   cron { 'puppet-agent':
