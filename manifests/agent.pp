@@ -47,6 +47,14 @@ class puppet::agent (
     setting => 'disable_i18n',
     value   => true,
   }
+  # lower priority
+  ini_setting { 'puppet.conf/main/priority':
+    ensure  => present,
+    path    => $conf_path,
+    section => 'main',
+    setting => 'priority',
+    value   => '10',
+  }
 
   $cron_ensure = $managed ? {
     true    => 'present',
