@@ -20,11 +20,4 @@ class puppet (
   package { "puppet${major_version}-release":
     require => Apt::Source["puppet${major_version}"],
   }
-
-  if $major_version >= 6 {
-    package { 'puppet5-release':
-      ensure  => purged,
-      require => Package["puppet${major_version}-release"],
-    }
-  }
 }
