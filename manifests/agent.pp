@@ -1,6 +1,7 @@
 #
 class puppet::agent (
   String           $cron_command        = 'exec /opt/puppetlabs/puppet/bin/puppet agent --onetime --no-daemonize',
+  Array[String]    $cron_hours          = ['0','2','6-18','22'],
   Optional[String] $cron_script_content = undef,
   Optional[String] $cron_script_file    = undef,
   String           $environment         = 'production',
@@ -79,7 +80,7 @@ class puppet::agent (
     user     => 'root',
     command  => $cron_command,
     minute   => fqdn_rand(60),
-    hour     =>  [0, 2, '6-18', 22],
+    hour     => $cron_hours,
     monthday => '*',
     month    => '*',
     weekday  => '*',
