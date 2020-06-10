@@ -7,10 +7,43 @@ class puppet::agent (
   String           $environment         = 'production',
   Boolean          $managed             = true,
 ) {
-  include puppet
-  package { 'puppet-agent':
-    ensure  => installed,
-    require => [Class['puppet'],Exec['apt_update']],
+  if defined($facts['os']['architecture']) and $facts['os']['architecture'] == 'aarch64' {
+    # Puppet agent package is not supported on ARM/Raspberry Pi.
+    # We use another technique to bring it in.
+    $puppet_package = 'puppet'
+    package { 'ruby-full':
+      ensure   => 'installed',
+    }
+    package { $puppet_package:
+      ensure   => 'installed',
+      provider => 'gem',
+      require  => Package['ruby-full'],
+    }
+    file { '/opt/puppetlabs/puppet/bin':
+      ensure => 'directory',
+      require => Package[$puppet_package],
+    }
+    file { '/opt/puppetlabs/puppet/bin/puppet':
+      ensure  => link,
+      target  => '/usr/local/bin/puppet',
+      require => Package[$puppet_package],
+    }
+
+  } else {
+
+    $puppet_package = 'puppet-agent'
+    include puppet
+    package { $puppet_package:
+      ensure  => installed,
+      require => [Class['puppet'],Exec['apt_update']],
+    }
+    # sudo's secure_path doesn't include /opt/puppetlabs/puppet/bin
+    # add this symlink to make this work: sudo puppet agent -t
+    file { '/usr/local/bin/puppet':
+      ensure  => link,
+      target  => '/opt/puppetlabs/puppet/bin/puppet',
+      require => Package[$puppet_package],
+    }
   }
 
   # run the puppet agent from cron to save on RAM
@@ -18,16 +51,9 @@ class puppet::agent (
   service { ['puppet','mcollective']:
     ensure  => stopped,
     enable  => false,
-    require => Package['puppet-agent'],
+    require => Package[$puppet_package],
   }
 
-  # sudo's secure_path doesn't include /opt/puppetlabs/puppet/bin
-  # add this symlink to make this work: sudo puppet agent -t
-  file { '/usr/local/bin/puppet':
-    ensure  => link,
-    target  => '/opt/puppetlabs/puppet/bin/puppet',
-    require => Package['puppet-agent'],
-  }
 
   # AIO puppet.conf path
   $conf_path = '/etc/puppetlabs/puppet/puppet.conf'
